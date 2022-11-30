@@ -1,0 +1,19 @@
+{
+    "chainId": 1,
+    "contracts": [
+        {
+            "address": "0x08f4b84852cdfacbb2082913a1caeb90afe5357a",
+            "contractName": "TestContract",
+            "selectors": {
+                "0x8ab936b8": {
+                    "erc20OfInterest": [
+                        "path.0"
+                    ],
+                    "method": "deposit",
+                    "plugin": "Test"
+		        }
+	        }
+	    }
+    ],
+    "name": "Spool"
+}

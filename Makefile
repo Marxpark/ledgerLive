@@ -21,8 +21,7 @@ endif
 
 include $(BOLOS_SDK)/Makefile.defines
 
-# EDIT THIS: Put your plugin name
-APPNAME = "Boilerplate"
+APPNAME = "Test"
 
 ifeq ($(ETHEREUM_PLUGIN_SDK),)
 ETHEREUM_PLUGIN_SDK=ethereum-plugin-sdk
