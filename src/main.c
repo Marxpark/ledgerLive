@@ -21,7 +21,7 @@
 
 #include "os.h"
 #include "cx.h"
-
+#include "glyphs.h"
 #include "test_plugin.h"
 
 // List of selectors supported by this plugin.
