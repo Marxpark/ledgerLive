@@ -17,28 +17,166 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <string.h>
 
 #include "os.h"
 #include "cx.h"
 
-#include "test_plugin.h"
+#include "glyphs.h"
 
-// List of selectors supported by this plugin.
-static const uint8_t DEPOSIT_SELECTOR[SELECTOR_SIZE] = {0x8a,
-                                                        0xb9,
-                                                        0x36,
-                                                        0xb8};
+#include "paraswap_plugin.h"
 
-// Array of all the different boilerplate selectors. Make sure this follows the same order as the
-// enum defined in `boilerplate_plugin.h`
-// EDIT THIS: Use the names of the array declared above.
-const uint8_t *const TEST_SELECTORS[NUM_SELECTORS] = {
-    DEPOSIT_SELECTOR
-};
+// ---------- Paraswap V5 -------------
+// Function: swapOnUniswap(uint256 amountIn, uint256 amountOutMin, address[] path) ***
+// Selector: 0x54840d1a
+static const uint8_t PARASWAP_SWAP_ON_UNISWAP_SELECTOR[SELECTOR_SIZE] = {0x54, 0x84, 0x0d, 0x1a};
 
-// Function to dispatch calls from the ethereum app.
-void dispatch_plugin_calls(int message, void *parameters) {
+// Function: swapOnUniswapFork(address factory, bytes32 initCode, uint256 amountIn, uint256
+// amountOutMin, address[] path)
+// Selector : 0xf5661034
+static const uint8_t PARASWAP_SWAP_ON_UNISWAP_FORK_SELECTOR[SELECTOR_SIZE] = {0xf5,
+                                                                              0x66,
+                                                                              0x10,
+                                                                              0x34};
+
+// Function: buyOnUniswap(uint256 amountInMax, uint256 amountOut, address[] path)
+// Selector: 0x935fb84b
+static const uint8_t PARASWAP_BUY_ON_UNISWAP_SELECTOR[SELECTOR_SIZE] = {0x93, 0x5f, 0xb8, 0x4b};
+
+// Function: buyOnUniswapFork(address factory, bytes32 initCode, uint256 amountInMax, uint256
+// amountOut, address[] path) ***
+// Selector: 0xc03786b0
+static const uint8_t PARASWAP_BUY_ON_UNISWAP_FORK_SELECTOR[SELECTOR_SIZE] = {0xc0,
+                                                                             0x37,
+                                                                             0x86,
+                                                                             0xb0};
+
+// Function: swapOnUniswapV2Fork(address tokenIn, uint256 amountIn,
+// uint256 amountOutMin, address weth, uint256[] pools)
+// Selector : 0x0b86a4c1
+static const uint8_t PARASWAP_SWAP_ON_UNISWAP_V2_FORK_SELECTOR[SELECTOR_SIZE] = {0x0b,
+                                                                                 0x86,
+                                                                                 0xa4,
+                                                                                 0xc1};
+
+// Function : simpleSwap((address fromToken,address toToken,uint256 fromAmount,uint256 toAmount,
+// uint256 expectedAmount,address[] callees,bytes exchangeData,uint256[] startIndexes,
+// uint256[] values,address beneficiary,address partner,uint256 feePercent,bytes permit,
+// uint256 deadline,bytes16 uuid))
+// Selector : 0x54e3f31b
+static const uint8_t PARASWAP_SIMPLE_SWAP_SELECTOR[SELECTOR_SIZE] = {0x54, 0xe3, 0xf3, 0x1b};
+
+// Function: multiSwap ((address fromToken, uint256 fromAmount, uint256 toAmount, uint256
+// expectedAmount, address payable beneficiary, Utils.Path[] path, address payable partner, uint256
+// feePercent, bytes permit, uint256 deadline, bytes16 uuid)) )
+// Selector: 0xa94e78ef
+static const uint8_t PARASWAP_MULTI_SWAP_SELECTOR[SELECTOR_SIZE] = {0xa9, 0x4e, 0x78, 0xef};
+
+// Function: megaSwap (( address fromToken, uint256 fromAmount, uint256 toAmount, uint256
+// expectedAmount, address payable beneficiary, Utils.MegaSwapPath[] path, address payable partner,
+// uint256 feePercent, bytes permit, uint256 deadline, bytes16 uuid)) external returns (
+// uint256 )
+// Selector: 0x46c67b6d
+static const uint8_t PARASWAP_MEGA_SWAP_SELECTOR[SELECTOR_SIZE] = {0x46, 0xc6, 0x7b, 0x6d};
+
+// Function: simpleBuy(( address fromToken, address toToken, uint256 fromAmount, uint256
+// toAmount, uint256 expectedAmount, address[] callees, bytes exchangeData, uint256[]
+// startIndexes, uint256[] values, address payable beneficiary, address payable partner, uint256
+// feePercent, bytes permit, uint256 deadline, bytes16 uuid,) ) external payable,
+// Selector: 0x2298207a
+static const uint8_t PARASWAP_SIMPLE_BUY_SELECTOR[SELECTOR_SIZE] = {0x22, 0x98, 0x20, 0x7a};
+
+// Function swapOnZeroXv4 ( address fromToken, address toToken, uint256 fromAmount, uint256
+// amountOutMin, address exchange, bytes payload )
+// Selector 0x64466805
+static const uint8_t PARASWAP_SWAP_ON_ZERO_V4_SELECTOR[SELECTOR_SIZE] = {0x64, 0x46, 0x68, 0x05};
+
+// Function: swapOnZeroXv2(address fromToken, address toToken, uint256 fromAmount, uint256
+// amountOutMin, address exchange, bytes payload)
+// Selector: 0x81033120
+static const uint8_t PARASWAP_SWAP_ON_ZERO_V2_SELECTOR[SELECTOR_SIZE] = {0x81, 0x03, 0x31, 0x20};
+// ---------- End Paraswap V5 -------------
+
+// ---------- Paraswap V4 -------------
+// Function : simpleSwap(address fromToken, address toToken, uint256 fromAmount, uint256 toAmount,
+// uint256 expectedAmount, address[] callees, bytes exchangeData, uint256[] startIndexes,
+// uint256[] values, address beneficiary, string referrer, bool useReduxToken)
+// Selector : 0xcfc0afeb
+static const uint8_t PARASWAP_SIMPLE_SWAP_V4_SELECTOR[SELECTOR_SIZE] = {0xcf, 0xc0, 0xaf, 0xeb};
+
+// Function: swapOnUniswap(uint256 amountIn, uint256 amountOutMin, address[] path, uint8 referrer)
+// Selector: 0x58b9d179
+static const uint8_t PARASWAP_SWAP_ON_UNISWAP_V4_SELECTOR[SELECTOR_SIZE] = {0x58, 0xb9, 0xd1, 0x79};
+
+// Function: swapOnUniswapFork(address factory, bytes32 initCode, uint256 amountIn, uint256
+// amountOutMin, address[] path, uint8 referrer)
+// Selector: 0x0863b7ac
+static const uint8_t PARASWAP_SWAP_ON_UNISWAP_FORK_V4_SELECTOR[SELECTOR_SIZE] = {0x08,
+                                                                                 0x63,
+                                                                                 0xb7,
+                                                                                 0xac};
+
+// Function: multiSwap ((address fromToken, uint256 fromAmount, uint256 toAmount, uint256
+// expectedAmount, address beneficiary, string referrer, bool useReduxToken,  Utils.Path[] path)))
+// Selector: 0x8f00eccb
+static const uint8_t PARASWAP_MULTI_SWAP_V4_SELECTOR[SELECTOR_SIZE] = {0x8f, 0x00, 0xec, 0xcb};
+
+// Function: megaSwap ((address fromToken, uint256 fromAmount, uint256 toAmount, uint256
+// expectedAmount, address beneficiary, string referrer, bool useReduxToken,  Utils.Path[] path)))
+// Selector: 0xec1d21dd
+static const uint8_t PARASWAP_MEGA_SWAP_V4_SELECTOR[SELECTOR_SIZE] = {0xec, 0x1d, 0x21, 0xdd};
+
+// Function : buy(address fromToken, address toToken, uint256 fromAmount, uint256 toAmount,
+//            address beneficiary, string referrer, bool useReduxToken, Utils.BuyRoute[] route)
+// Selector: 0xf95a49eb
+static const uint8_t PARASWAP_BUY_SELECTOR[SELECTOR_SIZE] = {0xf9, 0x5a, 0x49, 0xeb};
+
+// Function: buyOnUniswap(uint256 amountInMax, uint256 amountOut, address[] path, uint8 referrer)
+// Selector: 0xf9355f72
+static const uint8_t PARASWAP_BUY_ON_UNISWAP_V4_SELECTOR[SELECTOR_SIZE] = {0xf9, 0x35, 0x5f, 0x72};
+
+// Function: buyOnUniswapFork(address factory, bytes32 initCode, uint256 amountInMax, uint256
+// amountOut, address[] path, uint8 referrer)
+// Selector: 0x33635226
+static const uint8_t PARASWAP_BUY_ON_UNISWAP_FORK_V4_SELECTOR[SELECTOR_SIZE] = {0x33,
+                                                                                0x63,
+                                                                                0x52,
+                                                                                0x26};
+
+// ---------- End Paraswap V4 -------------
+
+// Array of all the different paraswap selectors.
+const uint8_t *const PARASWAP_SELECTORS[NUM_PARASWAP_SELECTORS] = {
+    PARASWAP_SWAP_ON_UNISWAP_SELECTOR,
+    PARASWAP_BUY_ON_UNISWAP_SELECTOR,
+    PARASWAP_SWAP_ON_UNISWAP_FORK_SELECTOR,
+    PARASWAP_SWAP_ON_UNISWAP_V2_FORK_SELECTOR,
+    PARASWAP_BUY_ON_UNISWAP_FORK_SELECTOR,
+    PARASWAP_SIMPLE_SWAP_SELECTOR,
+    PARASWAP_SIMPLE_BUY_SELECTOR,
+    PARASWAP_MULTI_SWAP_SELECTOR,
+    PARASWAP_BUY_SELECTOR,
+    PARASWAP_MEGA_SWAP_SELECTOR,
+    PARASWAP_SWAP_ON_ZERO_V4_SELECTOR,
+    PARASWAP_SWAP_ON_ZERO_V2_SELECTOR,
+    PARASWAP_SIMPLE_SWAP_V4_SELECTOR,
+    PARASWAP_SWAP_ON_UNISWAP_V4_SELECTOR,
+    PARASWAP_SWAP_ON_UNISWAP_FORK_V4_SELECTOR,
+    PARASWAP_MULTI_SWAP_V4_SELECTOR,
+    PARASWAP_MEGA_SWAP_V4_SELECTOR,
+    PARASWAP_BUY_ON_UNISWAP_V4_SELECTOR,
+    PARASWAP_BUY_ON_UNISWAP_FORK_V4_SELECTOR};
+
+// Paraswap uses `0xeeeee` as a dummy address to represent ETH.
+const uint8_t PARASWAP_ETH_ADDRESS[ADDRESS_LENGTH] = {0xee, 0xee, 0xee, 0xee, 0xee, 0xee, 0xee,
+                                                      0xee, 0xee, 0xee, 0xee, 0xee, 0xee, 0xee,
+                                                      0xee, 0xee, 0xee, 0xee, 0xee, 0xee};
+
+// Used to indicate that the beneficiary should be the sender.
+const uint8_t NULL_ETH_ADDRESS[ADDRESS_LENGTH] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
+void paraswap_plugin_call(int message, void *parameters) {
     switch (message) {
         case ETH_PLUGIN_INIT_CONTRACT:
             handle_init_contract(parameters);
@@ -74,7 +212,6 @@ void handle_query_ui_exception(unsigned int *args) {
     }
 }
 
-// Calls the ethereum app.
 void call_app_ethereum() {
     unsigned int libcall_params[3];
     libcall_params[0] = (unsigned int) "Ethereum";
@@ -83,12 +220,11 @@ void call_app_ethereum() {
     os_lib_call((unsigned int *) &libcall_params);
 }
 
-// Weird low-level black magic. No need to edit this.
 __attribute__((section(".boot"))) int main(int arg0) {
-    // Exit critical section
+    // exit critical section
     __asm volatile("cpsie i");
 
-    // Ensure exception will work as planned
+    // ensure exception will work as planned
     os_boot();
 
     // Try catch block. Please read the docs for more information on how to use those!
@@ -96,20 +232,19 @@ __attribute__((section(".boot"))) int main(int arg0) {
         TRY {
             // Low-level black magic.
             check_api_level(CX_COMPAT_APILEVEL);
-
             // Check if we are called from the dashboard.
             if (!arg0) {
-                // Called from dashboard, launch Ethereum app
+                // called from dashboard, launch Ethereum app
                 call_app_ethereum();
                 return 0;
             } else {
                 // Not called from dashboard: called from the ethereum app!
-                const unsigned int *args = (const unsigned int *) arg0;
+                const unsigned int *args = (unsigned int *) arg0;
 
                 // If `ETH_PLUGIN_CHECK_PRESENCE` is set, this means the caller is just trying to
-                // know whether this app exists or not. We can skip `dispatch_plugin_calls`.
+                // know whether this app exists or not. We can skip `paraswap_plugin_call`.
                 if (args[0] != ETH_PLUGIN_CHECK_PRESENCE) {
-                    dispatch_plugin_calls(args[0], (void *) args[1]);
+                    paraswap_plugin_call(args[0], (void *) args[1]);
                 }
             }
         }
@@ -126,12 +261,10 @@ __attribute__((section(".boot"))) int main(int arg0) {
             PRINTF("Exception 0x%x caught\n", e);
         }
         FINALLY {
-            // Call `os_lib_end`, go back to the ethereum app.
             os_lib_end();
         }
     }
     END_TRY;
 
-    // Will not get reached.
     return 0;
 }
