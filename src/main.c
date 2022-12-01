@@ -25,22 +25,16 @@
 #include "test_plugin.h"
 
 // List of selectors supported by this plugin.
-static const uint8_t APPROVE_SELECTOR[SELECTOR_SIZE] = {0x09, 0x5e, 0xa7, 0xb3};
-static const uint8_t DEPOSIT_SELECTOR[SELECTOR_SIZE] = {0x8a, 0xb9, 0x36, 0xb8};
-static const uint8_t WITHDRAW_SELECTOR[SELECTOR_SIZE] = {0xfd, 0x3c, 0x11, 0xa8};
-static const uint8_t WITHDRAW_FAST_SELECTOR[SELECTOR_SIZE] = {0xd7, 0xb9, 0xd4, 0x23};
-static const uint8_t GET_REWARDS_SELECTOR[SELECTOR_SIZE] = {0x51, 0x0c, 0xcb, 0x43};
-
+static const uint8_t DEPOSIT_SELECTOR[SELECTOR_SIZE] = {0x8a,
+                                                        0xb9,
+                                                        0x36,
+                                                        0xb8};
 
 // Array of all the different boilerplate selectors. Make sure this follows the same order as the
 // enum defined in `boilerplate_plugin.h`
 // EDIT THIS: Use the names of the array declared above.
 const uint8_t *const TEST_SELECTORS[NUM_SELECTORS] = {
-    APPROVE_SELECTOR,
-    DEPOSIT_SELECTOR,
-    WITHDRAW_SELECTOR,
-    WITHDRAW_FAST_SELECTOR,
-    GET_REWARDS_SELECTOR
+    DEPOSIT_SELECTOR
 };
 
 // Function to dispatch calls from the ethereum app.

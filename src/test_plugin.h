@@ -6,7 +6,7 @@
 
 // Number of selectors defined in this plugin. Should match the enum `selector_t`.
 // EDIT THIS: Put in the number of selectors your plugin is going to support.
-#define NUM_SELECTORS 5
+#define NUM_SELECTORS 1
 
 // Name of the plugin.
 // EDIT THIS: Replace with your plugin name.
@@ -16,11 +16,7 @@
 // Should follow the exact same order as the array declared in main.c
 // EDIT THIS: Change the naming (`selector_t`), and add your selector names.
 typedef enum {
-    APPROVE,
-    DEPOSIT,
-    WITHDRAW,
-    WITHDRAW_FAST,
-    GET_REWARDS
+    DEPOSIT
 } selector_t;
 
 // Enumeration used to parse the smart contract data.

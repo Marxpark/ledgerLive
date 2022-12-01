@@ -46,16 +46,6 @@ void handle_init_contract(void *parameters) {
     // to parse.
     switch (context->selectorIndex) {
         case DEPOSIT:
-        case WITHDRAW:
-            context->next_param = PATH_OFFSET;
-            break;
-        case APPROVE:
-            context->next_param = ADDRESS;
-            break;
-        case WITHDRAW_FAST:
-            context->next_param = PATH_OFFSET;
-            break;
-        case GET_REWARDS:
             context->next_param = PATH_OFFSET;
             break;
         default:

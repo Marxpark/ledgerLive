@@ -87,12 +87,6 @@ void handle_query_contract_ui(void *parameters) {
                 case DEPOSIT:
                     set_deposit_ui(msg, context);
                     break;
-                case WITHDRAW:
-                    set_withdraw_ui(msg, context);
-                    break;
-                case APPROVE:
-                    set_withdraw_ui(msg, context);
-                    break;
                 default:
                   PRINTF("Received an invalid screenIndex\n");
                   msg->result = ETH_PLUGIN_RESULT_ERROR;

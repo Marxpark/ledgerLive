@@ -10,11 +10,7 @@ void handle_finalize(void *parameters) {
 
     switch (context->selectorIndex) {
         case DEPOSIT:
-        case WITHDRAW:
             msg->numScreens = 2;
-            break;
-        case APPROVE:
-            msg->numScreens = 1;
             break;
     }
 

@@ -15,7 +15,7 @@ static void handle_deposit_and_withdraw(ethPluginProvideParameter_t *msg, contex
             case PATH_LENGTH:
                  context->offset = msg->parameterOffset - SELECTOR_SIZE + PARAMETER_LENGTH *1 ;
                  context->go_to_offset = true;
-                 context->next_param = UNEXPECTED_PARAMETER;
+                 context->next_param = TOKEN_RECEIVED;
                  break;
             case TOKEN_RECEIVED:
                 copy_address(context->token_received,
@@ -94,7 +94,6 @@ void handle_provide_parameter(void *parameters) {
     // EDIT THIS: adapt the cases and the names of the functions.
     switch (context->selectorIndex) {
         case DEPOSIT:
-        case WITHDRAW:
             handle_deposit_and_withdraw(msg, context);
             break;
 //         case APPROVE:
